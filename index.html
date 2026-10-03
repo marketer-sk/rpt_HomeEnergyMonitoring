@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Звіт">
+<meta name="theme-color" content="#ffffff">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Звіт</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; }
+  #box { position: fixed; inset: 0; }
+  iframe { width: 100%; height: 100%; border: 0; display: block; }
+  #msg { font: 16px/1.4 -apple-system, sans-serif; padding: 24px; color: #333; }
+</style>
+</head>
+<body>
+<div id="box"></div>
+
+<script>
+  // ====== НАЛАШТУВАННЯ ======
+  // Вставте сюди embed-URL зі звіту Looker Studio
+  // (Файл → Вбудувати звіт → Вбудувати URL)
+  const REPORT_URL = "https://datastudio.google.com/embed/reporting/e2e59cf0-6751-4ee6-802a-e4be64fbb1bf/page/bxM9F";
+
+  // Як часто оновлювати звіт, хвилин
+  const REFRESH_MINUTES = 15;
+  // ==========================
+
+  const box = document.getElementById("box");
+  let lastLoad = 0;
+
+  function load() {
+    box.innerHTML = "";
+    if (!REPORT_URL.startsWith("http")) {
+      box.innerHTML = '<div id="msg">Вкажіть embed-URL звіту в index.html (змінна REPORT_URL).</div>';
+      return;
+    }
+    const f = document.createElement("iframe");
+    f.src = REPORT_URL;
+    f.setAttribute("allowfullscreen", "");
+    box.appendChild(f);
+    lastLoad = Date.now();
+  }
+
+  load();
+
+  // Оновлення за таймером, поки застосунок на екрані
+  setInterval(() => { if (!document.hidden) load(); }, REFRESH_MINUTES * 60 * 1000);
+
+  // Якщо застосунок довго був у фоні, оновити одразу при поверненні
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && Date.now() - lastLoad > REFRESH_MINUTES * 60 * 1000) load();
+  });
+</script>
+</body>
+</html>
